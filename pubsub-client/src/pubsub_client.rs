@@ -309,7 +309,7 @@ fn connect_with_retry(
 ) -> Result<WebSocket<MaybeTlsStream<TcpStream>>, tungstenite::Error> {
     let mut connection_retries = 5;
     loop {
-        let req = http::Request::builder()
+        let mut req = http::Request::builder()
             .uri(url.as_str());
 
         headers.iter().for_each(|header| {
