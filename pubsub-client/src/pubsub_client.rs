@@ -308,7 +308,7 @@ fn connect_with_retry(
 ) -> Result<WebSocket<MaybeTlsStream<TcpStream>>, tungstenite::Error> {
     let mut connection_retries = 5;
     loop {
-        let req = http::Request::from(req_orig);
+        let req = http::Request::from(*req_orig);
         let result = connect(req).map(|(socket, _)| socket);
         if let Err(tungstenite::Error::Http(response)) = &result {
             if response.status() == reqwest::StatusCode::TOO_MANY_REQUESTS && connection_retries > 0
