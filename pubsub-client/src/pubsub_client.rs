@@ -308,13 +308,13 @@ fn connect_with_retry(
     headers: &Vec<[&str;2]>
 ) -> Result<WebSocket<MaybeTlsStream<TcpStream>>, tungstenite::Error> {
     let mut connection_retries = 5;
-    let headers_cp = headers.clone();
+    let headers_cp = *headers.clone();
     loop {
         let mut req = tungstenite::http::Request::builder()
             .uri(url.as_str());
 
         let mut n = 0;
-        while n < headers.len() {
+        while n < headers_cp.len() {
             req.headers_mut().unwrap().insert(headers_cp[n][0], HeaderValue::from_static(headers_cp[n][1]));
             n += 1;
         }
