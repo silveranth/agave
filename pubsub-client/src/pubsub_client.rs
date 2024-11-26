@@ -305,7 +305,7 @@ pub struct PubsubClient {}
 
 fn connect_with_retry(
     url:  Url,
-    headers: &Vec<[&str;2]>
+    headers: Vec<[&str;2]>
 ) -> Result<WebSocket<MaybeTlsStream<TcpStream>>, tungstenite::Error> {
     let mut connection_retries = 5;
     let headers_cp = headers.clone();
@@ -362,7 +362,7 @@ impl PubsubClient {
     /// [`accountSubscribe`]: https://solana.com/docs/rpc/websocket/accountsubscribe
     pub fn account_subscribe(
         url: &str,
-        headers: &Vec<[&str;2]>,
+        headers: Vec<[&str;2]>,
         pubkey: &Pubkey,
         config: Option<RpcAccountInfoConfig>,
     ) -> Result<AccountSubscription, PubsubClientError> {
@@ -416,7 +416,7 @@ impl PubsubClient {
     /// [`blockSubscribe`]: https://solana.com/docs/rpc/websocket/blocksubscribe
     pub fn block_subscribe(
         url: &str,
-        headers: &Vec<[&str;2]>,
+        headers: Vec<[&str;2]>,
         filter: RpcBlockSubscribeFilter,
         config: Option<RpcBlockSubscribeConfig>,
     ) -> Result<BlockSubscription, PubsubClientError> {
@@ -465,7 +465,7 @@ impl PubsubClient {
     /// [`logsSubscribe`]: https://solana.com/docs/rpc/websocket/logssubscribe
     pub fn logs_subscribe(
         url: &str,
-        headers: &Vec<[&str;2]>,
+        headers: Vec<[&str;2]>,
         filter: RpcTransactionLogsFilter,
         config: RpcTransactionLogsConfig,
     ) -> Result<LogsSubscription, PubsubClientError> {
@@ -515,7 +515,7 @@ impl PubsubClient {
     /// [`programSubscribe`]: https://solana.com/docs/rpc/websocket/programsubscribe
     pub fn program_subscribe(
         url: &str,
-        headers: &Vec<[&str;2]>,
+        headers: Vec<[&str;2]>,
         pubkey: &Pubkey,
         config: Option<RpcProgramAccountsConfig>,
     ) -> Result<ProgramSubscription, PubsubClientError> {
@@ -569,7 +569,7 @@ impl PubsubClient {
     /// This method corresponds directly to the [`voteSubscribe`] RPC method.
     ///
     /// [`voteSubscribe`]: https://solana.com/docs/rpc/websocket/votesubscribe
-    pub fn vote_subscribe(url: &str, headers: &Vec<[&str;2]>) -> Result<VoteSubscription, PubsubClientError> {
+    pub fn vote_subscribe(url: &str, headers: Vec<[&str;2]>) -> Result<VoteSubscription, PubsubClientError> {
         let url = Url::parse(url)?;
         let socket = connect_with_retry(url, headers)?;
         let (sender, receiver) = unbounded();
@@ -614,7 +614,7 @@ impl PubsubClient {
     /// This method corresponds directly to the [`rootSubscribe`] RPC method.
     ///
     /// [`rootSubscribe`]: https://solana.com/docs/rpc/websocket/rootsubscribe
-    pub fn root_subscribe(url: &str, headers: &Vec<[&str;2]>) -> Result<RootSubscription, PubsubClientError> {
+    pub fn root_subscribe(url: &str, headers: Vec<[&str;2]>) -> Result<RootSubscription, PubsubClientError> {
         let url = Url::parse(url)?;
         let socket = connect_with_retry(url, headers)?;
         let (sender, receiver) = unbounded();
@@ -662,7 +662,7 @@ impl PubsubClient {
     /// [`signatureSubscribe`]: https://solana.com/docs/rpc/websocket/signaturesubscribe
     pub fn signature_subscribe(
         url: &str,
-        headers: &Vec<[&str;2]>,
+        headers: Vec<[&str;2]>,
         signature: &Signature,
         config: Option<RpcSignatureSubscribeConfig>,
     ) -> Result<SignatureSubscription, PubsubClientError> {
@@ -712,7 +712,7 @@ impl PubsubClient {
     /// This method corresponds directly to the [`slotSubscribe`] RPC method.
     ///
     /// [`slotSubscribe`]: https://solana.com/docs/rpc/websocket/slotsubscribe
-    pub fn slot_subscribe(url: &str, headers: &Vec<[&str;2]>,) -> Result<SlotsSubscription, PubsubClientError> {
+    pub fn slot_subscribe(url: &str, headers: Vec<[&str;2]>,) -> Result<SlotsSubscription, PubsubClientError> {
         let url = Url::parse(url)?;
         let socket = connect_with_retry(url, headers)?;
         let (sender, receiver) = unbounded::<SlotInfo>();
@@ -762,7 +762,7 @@ impl PubsubClient {
     /// [`slotUpdatesSubscribe`]: https://solana.com/docs/rpc/websocket/slotsupdatessubscribe
     pub fn slot_updates_subscribe(
         url: &str,
-        headers: &Vec<[&str;2]>,
+        headers: Vec<[&str;2]>,
         handler: impl Fn(SlotUpdate) + Send + 'static,
     ) -> Result<PubsubClientSubscription<SlotUpdate>, PubsubClientError> {
         let url = Url::parse(url)?;
