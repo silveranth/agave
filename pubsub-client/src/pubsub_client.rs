@@ -126,6 +126,7 @@ use {
         time::Duration,
     },
     tungstenite::{http, connect, stream::MaybeTlsStream, Message, WebSocket},
+    tungstenite::http::HeaderValue,
     url::Url,
 };
 
@@ -312,7 +313,7 @@ fn connect_with_retry(
             .uri(url.as_str());
 
         headers.iter().for_each(|header| {
-            req = req.header(header[0], header[1]);
+            req.headers_mut().unwrap().insert(header[0], HeaderValue::from_static(header[1]));
         });
 
         let req_out = req.body(()).unwrap();
