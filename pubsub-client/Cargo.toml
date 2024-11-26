@@ -18,9 +18,9 @@ semver = { workspace = true }
 serde = { workspace = true }
 serde_derive = { workspace = true }
 serde_json = { workspace = true }
-solana-account-decoder = { workspace = true }
-solana-rpc-client-api = { workspace = true }
-solana-sdk = { workspace = true }
+solana-account-decoder = { version = "2.1.2" }
+solana-rpc-client-api = { version = "2.1.2" }
+solana-sdk = { version = "2.1.2" }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["full"] }
 tokio-stream = { workspace = true }
