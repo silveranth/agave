@@ -315,7 +315,7 @@ fn connect_with_retry(
 
         let mut n = 0;
         while n < headers_cp.len() {
-            req.headers_mut().unwrap().insert(headers_cp[n][0], HeaderValue::from_static(headers_cp[n][1]));
+            req.headers_mut().unwrap().insert(headers_cp[n][0].as_str(), HeaderValue::from_static(headers_cp[n][1].as_str()));
             n += 1;
         }
 
