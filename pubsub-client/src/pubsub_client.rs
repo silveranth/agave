@@ -90,7 +90,6 @@
 //! # Ok::<(), anyhow::Error>(())
 //! ```
 
-use tungstenite::http;
 pub use crate::nonblocking::pubsub_client::PubsubClientError;
 use {
     crossbeam_channel::{unbounded, Receiver, Sender},
@@ -126,7 +125,7 @@ use {
         thread::{sleep, JoinHandle},
         time::Duration,
     },
-    tungstenite::{connect, stream::MaybeTlsStream, Message, WebSocket},
+    tungstenite::{http, connect, stream::MaybeTlsStream, Message, WebSocket},
     url::Url,
 };
 
@@ -309,7 +308,7 @@ fn connect_with_retry(
 ) -> Result<WebSocket<MaybeTlsStream<TcpStream>>, tungstenite::Error> {
     let mut connection_retries = 5;
     loop {
-        let mut req = http::Request::builder()
+        let mut req = tungstenite::http::Request::builder()
             .uri(url.as_str());
 
         headers.iter().for_each(|header| {
