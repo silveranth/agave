@@ -38,57 +38,6 @@
 //!
 //! [`block_subscribe`]: https://docs.rs/solana-rpc/latest/solana_rpc/rpc_pubsub/trait.RpcSolPubSub.html#tymethod.block_subscribe
 //! [`vote_subscribe`]: https://docs.rs/solana-rpc/latest/solana_rpc/rpc_pubsub/trait.RpcSolPubSub.html#tymethod.vote_subscribe
-//!
-//! # Examples
-//!
-//! This example subscribes to account events and then loops forever receiving
-//! them.
-//!
-//! ```
-//! use anyhow::Result;
-//! use solana_commitment_config::CommitmentConfig;
-//! use solana_pubkey::Pubkey;
-//! use solana_pubsub_client::pubsub_client::PubsubClient;
-//! use solana_rpc_client_api::config::RpcAccountInfoConfig;
-//! use std::thread;
-//! use tungstenite::http;
-//!
-//! fn get_account_updates(account_pubkey: Pubkey) -> Result<()> {
-//!     let req = http::Request::builder()
-//!         .uri("wss://api.devnet.solana.com/")
-//!         .body(())
-//!         .unwrap();
-//!
-//!     let (mut account_subscription_client, account_subscription_receiver) =
-//!         PubsubClient::account_subscribe(
-//!             &req,
-//!             &account_pubkey,
-//!             Some(RpcAccountInfoConfig {
-//!                 encoding: None,
-//!                 data_slice: None,
-//!                 commitment: Some(CommitmentConfig::confirmed()),
-//!                 min_context_slot: None,
-//!             }),
-//!         )?;
-//!
-//!     loop {
-//!         match account_subscription_receiver.recv() {
-//!             Ok(response) => {
-//!                 println!("account subscription response: {:?}", response);
-//!             }
-//!             Err(e) => {
-//!                 println!("account subscription error: {:?}", e);
-//!                 break;
-//!             }
-//!         }
-//!     }
-//!
-//!     Ok(())
-//! }
-//! #
-//! # get_account_updates(solana_pubkey::new_rand());
-//! # Ok::<(), anyhow::Error>(())
-//! ```
 
 use serde::de::Unexpected::Str;
 pub use crate::nonblocking::pubsub_client::PubsubClientError;
