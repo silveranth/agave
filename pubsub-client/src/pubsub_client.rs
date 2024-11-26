@@ -115,7 +115,7 @@ use {
             RpcSignatureResult, RpcVote, SlotInfo, SlotUpdate,
         },
     },
-    solana_sdk::Signature,
+    solana_sdk::signature::Signature,
     std::{
         marker::PhantomData,
         net::TcpStream,
