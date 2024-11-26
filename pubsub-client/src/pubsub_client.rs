@@ -90,6 +90,7 @@
 //! # Ok::<(), anyhow::Error>(())
 //! ```
 
+use serde::de::Unexpected::Str;
 pub use crate::nonblocking::pubsub_client::PubsubClientError;
 use {
     crossbeam_channel::{unbounded, Receiver, Sender},
@@ -308,18 +309,18 @@ fn connect_with_retry(
     headers: Vec<[String;2]>
 ) -> Result<WebSocket<MaybeTlsStream<TcpStream>>, tungstenite::Error> {
     let mut connection_retries = 5;
-    let headers_cp = headers.clone();
+    static HEADERS_CP: Vec<[String;2]> = headers.clone();
     loop {
         let mut req = tungstenite::http::Request::builder()
             .uri(url.as_str());
 
         let mut n = 0;
-        while n < headers_cp.len() {
-            req.headers_mut().unwrap().insert(headers_cp[n][0].as_str(), HeaderValue::from_static(headers_cp[n][1].as_str()));
+        while n < HEADERS_CP.len() {
+            req.headers_mut().unwrap().insert(HEADERS_CP[n][0].as_str(), HeaderValue::from_static(HEADERS_CP[n][1].as_str()));
             n += 1;
         }
 
-        let req_out = req.body(()).unwrap();
+        let req_out = req.body(())?;
 
         let result = connect(req_out).map(|(socket, _)| socket);
         if let Err(tungstenite::Error::Http(response)) = &result {
