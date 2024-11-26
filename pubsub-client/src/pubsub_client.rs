@@ -312,9 +312,11 @@ fn connect_with_retry(
         let mut req = tungstenite::http::Request::builder()
             .uri(url.as_str());
 
-        headers.clone().iter().for_each(|header| {
-            req.headers_mut().unwrap().insert(header[0], HeaderValue::from_static(header[1]));
-        });
+        let mut n = 0;
+        while n < headers.len() {
+            req.headers_mut().unwrap().insert(headers[n][0], HeaderValue::from_static(headers[n][1]));
+            n += 1;
+        }
 
         let req_out = req.body(()).unwrap();
 
