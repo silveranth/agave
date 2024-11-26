@@ -304,12 +304,21 @@ pub type RootSubscription = (PubsubRootClientSubscription, Receiver<Slot>);
 pub struct PubsubClient {}
 
 fn connect_with_retry(
-    req_orig:  &http::Request<()>,
+    url:  Url,
+    headers: &Vec<[&str;2]>
 ) -> Result<WebSocket<MaybeTlsStream<TcpStream>>, tungstenite::Error> {
     let mut connection_retries = 5;
     loop {
-        let req = http::Request::from(*req_orig);
-        let result = connect(req).map(|(socket, _)| socket);
+        let req = http::Request::builder()
+            .uri(url.as_str());
+
+        headers.iter().for_each(|header| {
+            req = req.header(header[0], header[1]);
+        });
+
+        let req_out = req.body(()).unwrap();
+
+        let result = connect(req_out).map(|(socket, _)| socket);
         if let Err(tungstenite::Error::Http(response)) = &result {
             if response.status() == reqwest::StatusCode::TOO_MANY_REQUESTS && connection_retries > 0
             {
@@ -349,12 +358,13 @@ impl PubsubClient {
     ///
     /// [`accountSubscribe`]: https://solana.com/docs/rpc/websocket/accountsubscribe
     pub fn account_subscribe(
-        req: &http::Request<()>,
+        url: &str,
+        headers: &Vec<[&str;2]>,
         pubkey: &Pubkey,
         config: Option<RpcAccountInfoConfig>,
     ) -> Result<AccountSubscription, PubsubClientError> {
-        //let url = Url::parse(url)?;
-        let socket = connect_with_retry(req)?;
+        let url = Url::parse(url)?;
+        let socket = connect_with_retry(url, headers)?;
         let (sender, receiver) = unbounded();
 
         let socket = Arc::new(RwLock::new(socket));
@@ -402,12 +412,13 @@ impl PubsubClient {
     ///
     /// [`blockSubscribe`]: https://solana.com/docs/rpc/websocket/blocksubscribe
     pub fn block_subscribe(
-        req: &http::Request<()>,
+        url: &str,
+        headers: &Vec<[&str;2]>,
         filter: RpcBlockSubscribeFilter,
         config: Option<RpcBlockSubscribeConfig>,
     ) -> Result<BlockSubscription, PubsubClientError> {
-        //let url = Url::parse(url)?;
-        let socket = connect_with_retry(req)?;
+        let url = Url::parse(url)?;
+        let socket = connect_with_retry(url, headers)?;
         let (sender, receiver) = unbounded();
 
         let socket = Arc::new(RwLock::new(socket));
@@ -450,11 +461,13 @@ impl PubsubClient {
     ///
     /// [`logsSubscribe`]: https://solana.com/docs/rpc/websocket/logssubscribe
     pub fn logs_subscribe(
-        req: &http::Request<()>,
+        url: &str,
+        headers: &Vec<[&str;2]>,
         filter: RpcTransactionLogsFilter,
         config: RpcTransactionLogsConfig,
     ) -> Result<LogsSubscription, PubsubClientError> {
-        let socket = connect_with_retry(req)?;
+        let url = Url::parse(url)?;
+        let socket = connect_with_retry(url, headers)?;
         let (sender, receiver) = unbounded();
 
         let socket = Arc::new(RwLock::new(socket));
@@ -498,12 +511,13 @@ impl PubsubClient {
     ///
     /// [`programSubscribe`]: https://solana.com/docs/rpc/websocket/programsubscribe
     pub fn program_subscribe(
-        req: &http::Request<()>,
+        url: &str,
+        headers: &Vec<[&str;2]>,
         pubkey: &Pubkey,
         config: Option<RpcProgramAccountsConfig>,
     ) -> Result<ProgramSubscription, PubsubClientError> {
-        //let url = Url::parse(url)?;
-        let socket = connect_with_retry(req)?;
+        let url = Url::parse(url)?;
+        let socket = connect_with_retry(url, headers)?;
         let (sender, receiver) = unbounded();
 
         let socket = Arc::new(RwLock::new(socket));
@@ -552,9 +566,9 @@ impl PubsubClient {
     /// This method corresponds directly to the [`voteSubscribe`] RPC method.
     ///
     /// [`voteSubscribe`]: https://solana.com/docs/rpc/websocket/votesubscribe
-    pub fn vote_subscribe(req: &http::Request<()>) -> Result<VoteSubscription, PubsubClientError> {
-        //let url = Url::parse(url)?;
-        let socket = connect_with_retry(req)?;
+    pub fn vote_subscribe(url: &str, headers: &Vec<[&str;2]>) -> Result<VoteSubscription, PubsubClientError> {
+        let url = Url::parse(url)?;
+        let socket = connect_with_retry(url, headers)?;
         let (sender, receiver) = unbounded();
 
         let socket = Arc::new(RwLock::new(socket));
@@ -597,9 +611,9 @@ impl PubsubClient {
     /// This method corresponds directly to the [`rootSubscribe`] RPC method.
     ///
     /// [`rootSubscribe`]: https://solana.com/docs/rpc/websocket/rootsubscribe
-    pub fn root_subscribe(req: &http::Request<()>) -> Result<RootSubscription, PubsubClientError> {
-        //let url = Url::parse(url)?;
-        let socket = connect_with_retry(req)?;
+    pub fn root_subscribe(url: &str, headers: &Vec<[&str;2]>) -> Result<RootSubscription, PubsubClientError> {
+        let url = Url::parse(url)?;
+        let socket = connect_with_retry(url, headers)?;
         let (sender, receiver) = unbounded();
 
         let socket = Arc::new(RwLock::new(socket));
@@ -644,12 +658,13 @@ impl PubsubClient {
     ///
     /// [`signatureSubscribe`]: https://solana.com/docs/rpc/websocket/signaturesubscribe
     pub fn signature_subscribe(
-        req: &http::Request<()>,
+        url: &str,
+        headers: &Vec<[&str;2]>,
         signature: &Signature,
         config: Option<RpcSignatureSubscribeConfig>,
     ) -> Result<SignatureSubscription, PubsubClientError> {
-        //let url = Url::parse(url)?;
-        let socket = connect_with_retry(req)?;
+        let url = Url::parse(url)?;
+        let socket = connect_with_retry(url, headers)?;
         let (sender, receiver) = unbounded();
 
         let socket = Arc::new(RwLock::new(socket));
@@ -694,9 +709,9 @@ impl PubsubClient {
     /// This method corresponds directly to the [`slotSubscribe`] RPC method.
     ///
     /// [`slotSubscribe`]: https://solana.com/docs/rpc/websocket/slotsubscribe
-    pub fn slot_subscribe(req: &http::Request<()>) -> Result<SlotsSubscription, PubsubClientError> {
-        //let url = Url::parse(url)?;
-        let socket = connect_with_retry(req)?;
+    pub fn slot_subscribe(url: &str, headers: &Vec<[&str;2]>,) -> Result<SlotsSubscription, PubsubClientError> {
+        let url = Url::parse(url)?;
+        let socket = connect_with_retry(url, headers)?;
         let (sender, receiver) = unbounded::<SlotInfo>();
 
         let socket = Arc::new(RwLock::new(socket));
@@ -743,11 +758,12 @@ impl PubsubClient {
     ///
     /// [`slotUpdatesSubscribe`]: https://solana.com/docs/rpc/websocket/slotsupdatessubscribe
     pub fn slot_updates_subscribe(
-        req: &http::Request<()>,
+        url: &str,
+        headers: &Vec<[&str;2]>,
         handler: impl Fn(SlotUpdate) + Send + 'static,
     ) -> Result<PubsubClientSubscription<SlotUpdate>, PubsubClientError> {
-        //let url = Url::parse(url)?;
-        let socket = connect_with_retry(req)?;
+        let url = Url::parse(url)?;
+        let socket = connect_with_retry(url, headers)?;
 
         let socket = Arc::new(RwLock::new(socket));
         let socket_clone = socket.clone();
