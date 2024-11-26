@@ -78,6 +78,7 @@ use {
     url::Url,
 };
 
+
 /// A subscription.
 ///
 /// The subscription is unsubscribed on drop, and note that unsubscription (and
