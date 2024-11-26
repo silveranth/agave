@@ -304,10 +304,11 @@ pub type RootSubscription = (PubsubRootClientSubscription, Receiver<Slot>);
 pub struct PubsubClient {}
 
 fn connect_with_retry(
-    req:  &http::Request<()>,
+    req_orig:  &http::Request<()>,
 ) -> Result<WebSocket<MaybeTlsStream<TcpStream>>, tungstenite::Error> {
     let mut connection_retries = 5;
     loop {
+        let req = req_orig.try_into().unwrap();
         let result = connect(req).map(|(socket, _)| socket);
         if let Err(tungstenite::Error::Http(response)) = &result {
             if response.status() == reqwest::StatusCode::TOO_MANY_REQUESTS && connection_retries > 0
